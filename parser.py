@@ -21,59 +21,8 @@ def parse_tooltip(tooltip_left, tooltip_right):
         line = line.strip()
         match = None
 
-        # Basic Stats
-        if "+" in line:
-            if "Stamina" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["stamina"] = int(match.group(1))
-            elif "Agility" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["agility"] = int(match.group(1))
-            elif "Strength" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["strength"] = int(match.group(1))
-            elif "Intellect" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["intellect"] = int(match.group(1))
-            elif "Spirit" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["spirit"] = int(match.group(1))
-            elif "Attack Power" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["attack_power"] = int(match.group(1))
-            elif "Fire Resistance" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["fire_resistance"] = int(match.group(1))
-            elif "Frost Resistance" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["frost_resistance"] = int(match.group(1))
-            elif "Shadow Resistance" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["shadow_resistance"] = int(match.group(1))
-            elif "Nature Resistance" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["nature_resistance"] = int(match.group(1))
-            elif "Arcane Resistance" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["arcane_resistance"] = int(match.group(1))
-            elif "All Resistances" in line:
-                match = re.search(r'\+(\d+)', line)
-                if match:
-                    stats["all_resistances"] = int(match.group(1))
-
         # Equip effects
-        elif line.startswith("Equip:"):
+        if line.startswith("Equip:"):
             equip_effects.append(line.replace("Equip: ", ""))
         elif line.startswith("Chance on hit:"):
             equip_effects.append(line)
@@ -83,6 +32,19 @@ def parse_tooltip(tooltip_left, tooltip_right):
             match = re.search(r'Requires Level (\d+)', line)
             if match:
                 item["required_level"] = required_level = int(match.group(1))
+
+        # Basic Stats
+        elif "+" in line:
+            basic_stats = ["Stamina", "Agility", "Strength", "Intellect", "Spirit", 
+                           "Attack Power", "Fire Resistance", "Frost Resistance", 
+                           "Shadow Resistance", "Nature Resistance", "Arcane Resistance", 
+                           "All Resistances"]
+            for stat in basic_stats:
+                if stat in line:
+                    match = re.search(r'\+(\d+)', line)
+                    if match:
+                        stats[stat.lower().replace(" ", "_")] = int(match.group(1))
+                        break
 
         # Other info
         elif "Armor" in line:
@@ -299,6 +261,20 @@ def parse_tooltip(tooltip_left, tooltip_right):
         match = re.search(r'Improves your chance to hit by (\d+)%', effect)
         if match:
             stats["hit_chance"] = int(match.group(1))
+            parsed = True
+
+        # Weapon skill
+        match = re.search(r'Increased ([\w\s]+) \+(\d+)', effect)
+        if match:
+            skill = match.group(1).lower().replace(" ", "_")
+            stats[f"{skill}_skill"] = int(match.group(2))
+            parsed = True
+
+        # Two-handed Weapon skill
+        match = re.search(r'Increased Two-handed (\w+) \+(\d+)', effect)
+        if match:
+            skill = "two-handed_" + match.group(1).lower()
+            stats[f"{skill}_skill"] = int(match.group(2))
             parsed = True
 
         if not parsed:
