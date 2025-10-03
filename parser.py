@@ -317,7 +317,7 @@ for item_id, item_data in data.items():
         if "slot" in parsed_item or "type" in parsed_item:
             parsed_item["name"] = name
             encoded_name = urllib.parse.quote_plus(name)
-            parsed_item["database_link"] = f"https.database.turtle-wow.org/?search={encoded_name}"
+            parsed_item["database_link"] = f"https://database.turtle-wow.org/?search={encoded_name}"
             output.append(parsed_item)
             processed_names.add(name)
 
