@@ -137,6 +137,11 @@ def parse_tooltip(tooltip_left, tooltip_right):
             parsed = True
 
         # Attack power
+        match = re.search(r'\+(\d+) Attack Power', effect)
+        if match:
+            stats["attack_power"] = stats.get("attack_power", 0) + int(match.group(1))
+            parsed = True
+
         match = re.search(r'Increases your attack power by (\d+)', effect)
         if match:
             stats["attack_power"] = stats.get("attack_power", 0) + int(match.group(1))
